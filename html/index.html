@@ -71,32 +71,30 @@ var core = (function() {
         //console.log( 'Opening URL ' + url );
         state.m.innerHTML = 'Processing line #' + (state.index+1) + ': <strong>@'+item+'</strong>';
         state.w = window.open( url, 'w_'+item );
-        _wait_for_null();        
+        // _wait_for_window();
         return state.busy;
 	};
 
-	var _wait_for_null = function() {
-        if (state.w == null || state.w.window == null || state.w.window.closed) {
-            // console.log( 'Window closed, checking for next item...' );
-            _next_item();
-            return;
-        }
-
-        setTimeout( _wait_for_null, 250 );
-    };
-    
 	var _next_item = function() {
         var idx = state.index + 1;
         if (idx == state.total) {
             state.done = true;
             state.busy = false;
-            state.m.innerHTML = 'Processed '+state.total+' items.';
+            state.m.innerHTML = '&#10003; Processed '+state.total+' items.';
         } else {
             state.m.innerHTML = '';
             state.index = idx;
             _process_item();
         }
     };
+	
+	var _blur = function() {
+        // console.log( '_blur' );
+	};
+	var _focus = function() {
+        // console.log( '_focus' );
+        _next_item();
+	};
 	
 	var _init = function() {
         state.busy = false;
@@ -107,6 +105,9 @@ var core = (function() {
 		state.o = document.getElementById( 'source-list' );
 		state.b = document.getElementById( 'start' );
 		state.m = document.getElementById( 'message' );
+
+        window.addEventListener( 'blur', _blur );
+        window.addEventListener( 'focus', _focus );
 
 		state.b.onclick = _process_item;
 	};
