@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html><head><title></title>
+<style>
+body {
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
+h4 {
+    font-size: 16px;
+    margin: 2px 0px 10px;
+}
+#footer {
+    font-size: 12px;
+    color:#444;
+    text-align:center;
+}
+#footer a[href] {
+    text-decoration: none;
+    color: blue;
+}
+#input {
+  width: 380px;
+}
+
+#source-list {
+  margin:0;
+  border: 1px solid #666;
+  display:block;
+  width:380px;
+  padding: 2px;
+  width: 374px;
+}
+div#buttons {
+  margin: 2px 0 0 0;
+}
+
+div#message {
+  color: #fff;
+  background: #000;
+  padding: 2px;
+}
+</style>
+<script>
+var core = (function() {
+	var state = {};
+	var _process_item = function() {
+        if (!state.busy) {
+            var s = state.o.value.trim();
+            if (s.length > 0) {
+                state.lines = s.split( '\n' );
+                state.total = state.lines.length;
+                state.index = 0;
+                state.busy = (state.total > 0);
+            }
+            
+            if (state.total == 0) {
+                state.m.innerHTML = 'Nothing to do!';
+                return false;
+            }
+            //console.log( 'Total is '+state.total );
+        }
+        
+        if (state.done) {
+            state.m.innerHTML = 'All done!';
+            return false;
+        }
+        
+        var item = state.lines[ state.index ].replace( '@', '' );
+        var url = 'https://example.com/'+item;
+        //console.log( 'Opening URL ' + url );
+        state.m.innerHTML = 'Processing line #' + (state.index+1) + ': <strong>@'+item+'</strong>';
+        state.w = window.open( url, 'w_'+item );
+        _wait_for_null();        
+        return state.busy;
+	};
+
+	var _wait_for_null = function() {
+        if (state.w == null || state.w.window == null || state.w.window.closed) {
+            // console.log( 'Window closed, checking for next item...' );
+            _next_item();
+            return;
+        }
+
+        setTimeout( _wait_for_null, 250 );
+    };
+    
+	var _next_item = function() {
+        var idx = state.index + 1;
+        if (idx == state.total) {
+            state.done = true;
+            state.busy = false;
+            state.m.innerHTML = 'Processed '+state.total+' items.';
+        } else {
+            state.m.innerHTML = '';
+            state.index = idx;
+            _process_item();
+        }
+    };
+	
+	var _init = function() {
+        state.busy = false;
+        state.done = false;
+        state.index = 0;
+        state.total = 0;
+        
+		state.o = document.getElementById( 'source-list' );
+		state.b = document.getElementById( 'start' );
+		state.m = document.getElementById( 'message' );
+
+		state.b.onclick = _process_item;
+	};
+
+	return {
+		init: _init
+    }
+})();
+</script></head>
+<body onload="core.init()">
+<h4>What is this?</h4>
+<p>This quick and dirty page allows you to follow (or unfollow) many Twitter 
+accounts from a list of items.</p>
+<h4>How it works</h4>
+<p>It will simply iterate all the items, and for each item, open a browser tabs with the
+profile page on Twitter. You can choose to Follow (or Unfollow) that user.</p>
+<p>After closing the profile page the next item will be loaded.</p>
+<p>This repeats itself until all items have been processed.</p>
+<div id="input">
+  <textarea rows=20 id="source-list" placeholder="paste list of items here"></textarea>
+  <div id="message">Paste list of handles and click on 'go'&hellip;</div>
+</div>
+<div id="buttons">
+<button id="start">go</button>
+</div>
+<div id="footer"><a href="https://twitter.com/gr4yc0de">@gr4yc0de</a> | <a href="https://github.com/gr4yc0de/twtool1">github</a></div>
+</body>
+</html>
