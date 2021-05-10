@@ -77,6 +77,10 @@ var core = (function() {
 	};
 
 	var _next_item = function() {
+        if (state.done) {
+            return;
+        }
+        
         var idx = state.index + 1;
         if (idx == state.total) {
             state.done = true;
