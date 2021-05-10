@@ -67,7 +67,7 @@ var core = (function() {
         }
         
         var item = state.lines[ state.index ].replace( '@', '' );
-        var url = 'https://example.com/'+item;
+        var url = 'https://twitter.com/'+item;
         //console.log( 'Opening URL ' + url );
         state.m.innerHTML = 'Processing line #' + (state.index+1) + ': <strong>@'+item+'</strong>';
         state.w = window.open( url, 'w_'+item );
